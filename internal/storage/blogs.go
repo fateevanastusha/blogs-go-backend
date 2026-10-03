@@ -7,17 +7,17 @@ import (
 	"github.com/fateevanastusha/blogs-go-backend/internal/model"
 )
 
-type BlogsRepo struct {
+type blogsRepo struct {
 	blogs  []model.Blog
 	mu     sync.Mutex
 	nextID int
 }
 
-func NewBlogsRepo() *BlogsRepo {
-	return &BlogsRepo{nextID: 1}
+func NewBlogsRepo() *blogsRepo {
+	return &blogsRepo{nextID: 1}
 }
 
-func (br *BlogsRepo) findIndexByID(id int) (int, error) {
+func (br *blogsRepo) findIndexByID(id int) (int, error) {
 	for i, b := range br.blogs {
 		if b.ID == id {
 			return i, nil
@@ -27,7 +27,7 @@ func (br *BlogsRepo) findIndexByID(id int) (int, error) {
 
 }
 
-func (br *BlogsRepo) Create(ctx context.Context, name, description, WebsiteURL string) (model.Blog, error) {
+func (br *blogsRepo) Create(ctx context.Context, name, description, websiteURL string) (model.Blog, error) {
 	br.mu.Lock()
 	defer br.mu.Unlock()
 
@@ -35,7 +35,7 @@ func (br *BlogsRepo) Create(ctx context.Context, name, description, WebsiteURL s
 		ID:          br.nextID,
 		Name:        name,
 		Description: description,
-		WebsiteURL:  WebsiteURL,
+		WebsiteURL:  websiteURL,
 	}
 
 	br.blogs = append(br.blogs, blog)
@@ -43,7 +43,7 @@ func (br *BlogsRepo) Create(ctx context.Context, name, description, WebsiteURL s
 	return blog, nil
 }
 
-func (br *BlogsRepo) Update(ctx context.Context, id int, name, description, websiteURL string) (model.Blog, error) {
+func (br *blogsRepo) Update(ctx context.Context, id int, name, description, websiteURL string) (model.Blog, error) {
 	br.mu.Lock()
 	defer br.mu.Unlock()
 
@@ -58,7 +58,7 @@ func (br *BlogsRepo) Update(ctx context.Context, id int, name, description, webs
 	return *blog, nil
 }
 
-func (br *BlogsRepo) Delete(ctx context.Context, id int) error {
+func (br *blogsRepo) Delete(ctx context.Context, id int) error {
 	br.mu.Lock()
 	defer br.mu.Unlock()
 
@@ -70,7 +70,7 @@ func (br *BlogsRepo) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func (br *BlogsRepo) GetByID(ctx context.Context, id int) (model.Blog, error) {
+func (br *blogsRepo) GetByID(ctx context.Context, id int) (model.Blog, error) {
 	br.mu.Lock()
 	defer br.mu.Unlock()
 
@@ -83,7 +83,7 @@ func (br *BlogsRepo) GetByID(ctx context.Context, id int) (model.Blog, error) {
 	return blog, nil
 }
 
-func (br *BlogsRepo) GetAll(ctx context.Context) []model.Blog {
+func (br *blogsRepo) GetAll(ctx context.Context) []model.Blog {
 	br.mu.Lock()
 	defer br.mu.Unlock()
 

@@ -7,17 +7,17 @@ import (
 	"github.com/fateevanastusha/blogs-go-backend/internal/model"
 )
 
-type PostsRepo struct {
+type postsRepo struct {
 	posts  []model.Post
 	mu     sync.Mutex
 	nextID int
 }
 
-func NewPostsRepo() *PostsRepo {
-	return &PostsRepo{nextID: 1}
+func NewPostsRepo() *postsRepo {
+	return &postsRepo{nextID: 1}
 }
 
-func (br *PostsRepo) findIndexByID(id int) (int, error) {
+func (br *postsRepo) findIndexByID(id int) (int, error) {
 	for i, b := range br.posts {
 		if b.ID == id {
 			return i, nil
@@ -27,7 +27,7 @@ func (br *PostsRepo) findIndexByID(id int) (int, error) {
 
 }
 
-func (br *PostsRepo) Create(ctx context.Context, title, shortDescription, content string, blogId int) (model.Post, error) {
+func (br *postsRepo) Create(ctx context.Context, title, shortDescription, content string, blogId int) (model.Post, error) {
 	br.mu.Lock()
 	defer br.mu.Unlock()
 
@@ -44,7 +44,7 @@ func (br *PostsRepo) Create(ctx context.Context, title, shortDescription, conten
 	return post, nil
 }
 
-func (br *PostsRepo) Update(ctx context.Context, id int, title, shortDescription, content string) (model.Post, error) {
+func (br *postsRepo) Update(ctx context.Context, id int, title, shortDescription, content string) (model.Post, error) {
 	br.mu.Lock()
 	defer br.mu.Unlock()
 
@@ -59,7 +59,7 @@ func (br *PostsRepo) Update(ctx context.Context, id int, title, shortDescription
 	return *post, nil
 }
 
-func (br *PostsRepo) Delete(ctx context.Context, id int) error {
+func (br *postsRepo) Delete(ctx context.Context, id int) error {
 	br.mu.Lock()
 	defer br.mu.Unlock()
 
@@ -71,7 +71,7 @@ func (br *PostsRepo) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func (br *PostsRepo) GetByID(ctx context.Context, id int) (model.Post, error) {
+func (br *postsRepo) GetByID(ctx context.Context, id int) (model.Post, error) {
 	br.mu.Lock()
 	defer br.mu.Unlock()
 
@@ -84,7 +84,7 @@ func (br *PostsRepo) GetByID(ctx context.Context, id int) (model.Post, error) {
 	return post, nil
 }
 
-func (br *PostsRepo) GetAll(ctx context.Context) []model.Post {
+func (br *postsRepo) GetAll(ctx context.Context) []model.Post {
 	br.mu.Lock()
 	defer br.mu.Unlock()
 
