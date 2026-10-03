@@ -10,10 +10,10 @@ import (
 )
 
 type postsService interface {
-	Create(ctx context.Context, title, shortDescription, content string, blogId int) (model.Post, error)
-	Update(ctx context.Context, id int, title, shortDescription, content string) (model.Post, error)
-	Delete(ctx context.Context, id int) error
-	GetByID(ctx context.Context, id int) (model.Post, error)
+	Create(ctx context.Context, title, shortDescription, content string, blogID int) (model.Post, error)
+	Update(ctx context.Context, ID int, title, shortDescription, content string) (model.Post, error)
+	Delete(ctx context.Context, ID int) error
+	GetByID(ctx context.Context, ID int) (model.Post, error)
 	GetAll(ctx context.Context) []model.Post
 }
 
@@ -22,18 +22,18 @@ type Posts struct {
 	service postsService
 }
 
-func ConfigurePostsRouter(r *mux.Router, logger *logrus.Logger, service postsService) *Posts {
+func ConfigurePostsRouter(r *mux.Router, logger *logrus.Logger, service postsService) error {
 	posts := &Posts{
 		logger:  logger,
 		service: service,
 	}
 	sub := r.PathPrefix("/posts").Subrouter()
 	sub.HandleFunc("", posts.getAll()).Methods("GET")
-	sub.HandleFunc("/{id}", posts.getByID()).Methods("GET")
+	sub.HandleFunc("/{ID}", posts.getByID()).Methods("GET")
 	sub.HandleFunc("", posts.create()).Methods("POST")
-	sub.HandleFunc("/{id}", posts.putByID()).Methods("PUT")
-	sub.HandleFunc("/{id}", posts.deleteByID()).Methods("DELETE")
-	return posts
+	sub.HandleFunc("/{ID}", posts.putByID()).Methods("PUT")
+	sub.HandleFunc("/{ID}", posts.deleteByID()).Methods("DELETE")
+	return nil
 }
 
 func (b *Posts) getAll() http.HandlerFunc {

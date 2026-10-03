@@ -8,42 +8,48 @@ import (
 )
 
 type postsRepo interface {
-	Create(ctx context.Context, title, shortDescription, content string, blogId int) (model.Post, error)
-	Update(ctx context.Context, id int, title, shortDescription, content string) (model.Post, error)
-	Delete(ctx context.Context, id int) error
-	GetByID(ctx context.Context, id int) (model.Post, error)
+	Create(ctx context.Context, title, shortDescription, content string, blogID int) (model.Post, error)
+	Update(ctx context.Context, ID int, title, shortDescription, content string) (model.Post, error)
+	Delete(ctx context.Context, ID int) error
+	GetByID(ctx context.Context, ID int) (model.Post, error)
 	GetAll(ctx context.Context) []model.Post
+	GetByBlogID(ctx context.Context, blogID int) []model.Post
 }
 
-type blogsRepo interface {
-	GetByID(ctx context.Context, id int) (model.Post, error)
+type blogsReader interface {
+	GetByID(ctx context.Context, ID int) (model.Blog, error)
 }
 
-type postsService struct {
-	repo      postsRepo
-	blogsRepo blogsRepo
+type PostsService struct {
+	repo        postsRepo
+	blogsReader blogsReader
 }
 
-func NewPostsService(repo postsRepo, blogsRepo blogsRepo) *postsService {
-	return &postsService{repo: repo, blogsRepo: blogsRepo}
+func NewPostsService(repo postsRepo, blogsReader blogsReader) *PostsService {
+	return &PostsService{repo: repo, blogsReader: blogsReader}
 }
 
-func (bs *postsService) Create(ctx context.Context, title, shortDescription, content string, blogId int) (model.Post, error) {
-	if _, err := bs.blogsRepo.GetByID(ctx, blogId); errors.Is(err, model.ErrNotFound) {
-		return model.Post{}, model.ErrBlogNotFound
+func (ps *PostsService) Create(ctx context.Context, title, shortDescription, content string, blogID int) (model.Post, error) {
+	if _, err := ps.blogsReader.GetByID(ctx, blogID); err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return model.Post{}, model.ErrBlogNotFound
+		}
+		return model.Post{}, err
 	}
-	return bs.repo.Create(ctx, title, shortDescription, content, blogId)
+	return ps.repo.Create(ctx, title, shortDescription, content, blogID)
 }
-func (bs *postsService) Update(ctx context.Context, id int, title, shortDescription, content string) (model.Post, error) {
-	return bs.repo.Update(ctx, id, title, shortDescription, content)
+func (ps *PostsService) Update(ctx context.Context, ID int, title, shortDescription, content string) (model.Post, error) {
+	return ps.repo.Update(ctx, ID, title, shortDescription, content)
 }
-func (bs *postsService) Delete(ctx context.Context, id int) error {
-	return bs.repo.Delete(ctx, id)
+func (ps *PostsService) Delete(ctx context.Context, ID int) error {
+	return ps.repo.Delete(ctx, ID)
 }
-func (bs *postsService) GetByID(ctx context.Context, id int) (model.Post, error) {
-
-	return bs.repo.GetByID(ctx, id)
+func (ps *PostsService) GetByID(ctx context.Context, ID int) (model.Post, error) {
+	return ps.repo.GetByID(ctx, ID)
 }
-func (bs *postsService) GetAll(ctx context.Context) []model.Post {
-	return bs.repo.GetAll(ctx)
+func (ps *PostsService) GetAll(ctx context.Context) []model.Post {
+	return ps.repo.GetAll(ctx)
+}
+func (ps *PostsService) GetByBlogID(ctx context.Context, blogID int) []model.Post {
+	return ps.repo.GetByBlogID(ctx, blogID)
 }

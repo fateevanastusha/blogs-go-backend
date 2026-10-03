@@ -11,9 +11,9 @@ import (
 
 type blogsService interface {
 	Create(ctx context.Context, name, description, websiteURL string) (model.Blog, error)
-	Update(ctx context.Context, id int, name, description, websiteURL string) (model.Blog, error)
-	Delete(ctx context.Context, id int) error
-	GetByID(ctx context.Context, id int) (model.Blog, error)
+	Update(ctx context.Context, ID int, name, description, websiteURL string) (model.Blog, error)
+	Delete(ctx context.Context, ID int) error
+	GetByID(ctx context.Context, ID int) (model.Blog, error)
 	GetAll(ctx context.Context) []model.Blog
 }
 
@@ -22,18 +22,18 @@ type Blogs struct {
 	service blogsService
 }
 
-func ConfigureBlogsRouter(r *mux.Router, logger *logrus.Logger, service blogsService) *Blogs {
+func ConfigureBlogsRouter(r *mux.Router, logger *logrus.Logger, service blogsService) error {
 	blogs := &Blogs{
 		logger:  logger,
 		service: service,
 	}
 	sub := r.PathPrefix("/blogs").Subrouter()
 	sub.HandleFunc("", blogs.getAll()).Methods("GET")
-	sub.HandleFunc("/{id}", blogs.getByID()).Methods("GET")
+	sub.HandleFunc("/{ID}", blogs.getByID()).Methods("GET")
 	sub.HandleFunc("", blogs.create()).Methods("POST")
-	sub.HandleFunc("/{id}", blogs.putByID()).Methods("PUT")
-	sub.HandleFunc("/{id}", blogs.deleteByID()).Methods("DELETE")
-	return blogs
+	sub.HandleFunc("/{ID}", blogs.putByID()).Methods("PUT")
+	sub.HandleFunc("/{ID}", blogs.deleteByID()).Methods("DELETE")
+	return nil
 }
 
 func (b *Blogs) getAll() http.HandlerFunc {

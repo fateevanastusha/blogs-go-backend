@@ -7,19 +7,19 @@ import (
 	"github.com/fateevanastusha/blogs-go-backend/internal/model"
 )
 
-type postsRepo struct {
+type PostsRepo struct {
 	posts  []model.Post
 	mu     sync.Mutex
 	nextID int
 }
 
-func NewPostsRepo() *postsRepo {
-	return &postsRepo{nextID: 1}
+func NewPostsRepo() *PostsRepo {
+	return &PostsRepo{nextID: 1}
 }
 
-func (br *postsRepo) findIndexByID(id int) (int, error) {
-	for i, b := range br.posts {
-		if b.ID == id {
+func (pr *PostsRepo) findIndexByID(ID int) (int, error) {
+	for i, b := range pr.posts {
+		if b.ID == ID {
 			return i, nil
 		}
 	}
@@ -27,68 +27,81 @@ func (br *postsRepo) findIndexByID(id int) (int, error) {
 
 }
 
-func (br *postsRepo) Create(ctx context.Context, title, shortDescription, content string, blogId int) (model.Post, error) {
-	br.mu.Lock()
-	defer br.mu.Unlock()
+func (pr *PostsRepo) Create(ctx context.Context, title, shortDescription, content string, blogID int) (model.Post, error) {
+	pr.mu.Lock()
+	defer pr.mu.Unlock()
 
 	post := model.Post{
-		ID:               br.nextID,
+		ID:               pr.nextID,
 		Title:            title,
 		ShortDescription: shortDescription,
 		Content:          content,
-		BlogID:           blogId,
+		BlogID:           blogID,
 	}
 
-	br.posts = append(br.posts, post)
-	br.nextID++
+	pr.posts = append(pr.posts, post)
+	pr.nextID++
 	return post, nil
 }
 
-func (br *postsRepo) Update(ctx context.Context, id int, title, shortDescription, content string) (model.Post, error) {
-	br.mu.Lock()
-	defer br.mu.Unlock()
+func (pr *PostsRepo) Update(ctx context.Context, ID int, title, shortDescription, content string) (model.Post, error) {
+	pr.mu.Lock()
+	defer pr.mu.Unlock()
 
-	index, err := br.findIndexByID(id)
+	index, err := pr.findIndexByID(ID)
 	if err != nil {
 		return model.Post{}, err
 	}
-	post := &br.posts[index]
+	post := &pr.posts[index]
 	post.Title = title
 	post.ShortDescription = shortDescription
 	post.Content = content
 	return *post, nil
 }
 
-func (br *postsRepo) Delete(ctx context.Context, id int) error {
-	br.mu.Lock()
-	defer br.mu.Unlock()
+func (pr *PostsRepo) Delete(ctx context.Context, ID int) error {
+	pr.mu.Lock()
+	defer pr.mu.Unlock()
 
-	index, err := br.findIndexByID(id)
+	index, err := pr.findIndexByID(ID)
 	if err != nil {
 		return err
 	}
-	br.posts = append(br.posts[:index], br.posts[index+1:]...)
+	pr.posts = append(pr.posts[:index], pr.posts[index+1:]...)
 	return nil
 }
 
-func (br *postsRepo) GetByID(ctx context.Context, id int) (model.Post, error) {
-	br.mu.Lock()
-	defer br.mu.Unlock()
+func (pr *PostsRepo) GetByID(ctx context.Context, ID int) (model.Post, error) {
+	pr.mu.Lock()
+	defer pr.mu.Unlock()
 
-	index, err := br.findIndexByID(id)
+	index, err := pr.findIndexByID(ID)
 	if err != nil {
 		return model.Post{}, err
 	}
 
-	post := br.posts[index]
+	post := pr.posts[index]
 	return post, nil
 }
 
-func (br *postsRepo) GetAll(ctx context.Context) []model.Post {
-	br.mu.Lock()
-	defer br.mu.Unlock()
+func (pr *PostsRepo) GetAll(ctx context.Context) []model.Post {
+	pr.mu.Lock()
+	defer pr.mu.Unlock()
 
-	res := make([]model.Post, len(br.posts))
-	copy(res, br.posts)
+	res := make([]model.Post, len(pr.posts))
+	copy(res, pr.posts)
+	return res
+}
+
+func (pr *PostsRepo) GetByBlogID(ctx context.Context, blogID int) []model.Post {
+	pr.mu.Lock()
+	defer pr.mu.Unlock()
+
+	res := []model.Post{}
+	for _, p := range pr.posts {
+		if p.BlogID == blogID {
+			res = append(res, p)
+		}
+	}
 	return res
 }

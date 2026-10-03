@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/fateevanastusha/blogs-go-backend/internal/router"
@@ -33,10 +34,14 @@ func (s *Server) configureRouter() {
 	blogsRepo := storage.NewBlogsRepo()
 	postsRepo := storage.NewPostsRepo()
 
-	blogsService := service.NewBlogsService(blogsRepo)
+	blogsService := service.NewBlogsService(blogsRepo, postsRepo)
 	postsService := service.NewPostsService(postsRepo, blogsRepo)
 
-	router.ConfigureBlogsRouter(s.Router, s.logger, blogsService)
-	router.ConfigurePostsRouter(s.Router, s.logger, postsService)
+	if err := router.ConfigureBlogsRouter(s.Router, s.logger, blogsService); err != nil {
+		log.Fatal(err)
+	}
+	if err := router.ConfigurePostsRouter(s.Router, s.logger, postsService); err != nil {
+		log.Fatal(err)
+	}
 
 }
