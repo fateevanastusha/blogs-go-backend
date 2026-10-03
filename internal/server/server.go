@@ -29,18 +29,14 @@ func Start(address string) error {
 }
 
 func (s *Server) configureRouter() {
-	s.configureBlogs()
-	s.configurePosts()
-}
 
-func (s *Server) configureBlogs() {
-	repo := storage.NewBlogsRepo()
-	service := service.NewBlogsService(repo)
-	router.ConfigureBlogsRouter(s.Router, s.logger, service)
-}
+	blogsRepo := storage.NewBlogsRepo()
+	postsRepo := storage.NewPostsRepo()
 
-func (s *Server) configurePosts() {
-	repo := storage.NewPostsRepo()
-	service := service.NewPostsService(repo)
-	router.ConfigurePostsRouter(s.Router, s.logger, service)
+	blogsService := service.NewBlogsService(blogsRepo)
+	postsService := service.NewPostsService(postsRepo, blogsRepo)
+
+	router.ConfigureBlogsRouter(s.Router, s.logger, blogsService)
+	router.ConfigurePostsRouter(s.Router, s.logger, postsService)
+
 }
