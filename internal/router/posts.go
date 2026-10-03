@@ -17,25 +17,27 @@ func ConfigurePostsRouter(r *mux.Router, logger *logrus.Logger) *Posts {
 	}
 	sub := r.PathPrefix("/blogs").Subrouter()
 	sub.HandleFunc("", blogs.getAll()).Methods("GET")
-	sub.HandleFunc("/{id}", blogs.getById()).Methods("GET")
+	sub.HandleFunc("/{id}", blogs.getByID()).Methods("GET")
 	sub.HandleFunc("", blogs.create()).Methods("POST")
-	sub.HandleFunc("/{id}", blogs.putById()).Methods("PUT")
-	sub.HandleFunc("/{id}", blogs.deleteById()).Methods("DELETE")
+	sub.HandleFunc("/{id}", blogs.putByID()).Methods("PUT")
+	sub.HandleFunc("/{id}", blogs.deleteByID()).Methods("DELETE")
 	return blogs
 }
 
 func (b *Posts) getAll() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {}
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
 }
-func (b *Posts) getById() http.HandlerFunc {
+func (b *Posts) getByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {}
 }
 func (b *Posts) create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {}
 }
-func (b *Posts) putById() http.HandlerFunc {
+func (b *Posts) putByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {}
 }
-func (b *Posts) deleteById() http.HandlerFunc {
+func (b *Posts) deleteByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {}
 }

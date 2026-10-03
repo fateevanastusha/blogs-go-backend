@@ -17,25 +17,25 @@ func ConfigureBlogsRouter(r *mux.Router, logger *logrus.Logger) *Blogs {
 	}
 	sub := r.PathPrefix("/blogs").Subrouter()
 	sub.HandleFunc("", blogs.getAll()).Methods("GET")
-	sub.HandleFunc("/{id}", blogs.getById()).Methods("GET")
+	sub.HandleFunc("/{id}", blogs.getByID()).Methods("GET")
 	sub.HandleFunc("", blogs.create()).Methods("POST")
-	sub.HandleFunc("/{id}", blogs.putById()).Methods("PUT")
-	sub.HandleFunc("/{id}", blogs.deleteById()).Methods("DELETE")
+	sub.HandleFunc("/{id}", blogs.putByID()).Methods("PUT")
+	sub.HandleFunc("/{id}", blogs.deleteByID()).Methods("DELETE")
 	return blogs
 }
 
 func (b *Blogs) getAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {}
 }
-func (b *Blogs) getById() http.HandlerFunc {
+func (b *Blogs) getByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {}
 }
 func (b *Blogs) create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {}
 }
-func (b *Blogs) putById() http.HandlerFunc {
+func (b *Blogs) putByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {}
 }
-func (b *Blogs) deleteById() http.HandlerFunc {
+func (b *Blogs) deleteByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {}
 }
