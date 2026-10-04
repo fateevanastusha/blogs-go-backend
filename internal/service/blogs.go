@@ -15,7 +15,7 @@ type blogsRepo interface {
 }
 
 type postReader interface {
-	GetByBlogID(ctx context.Context, blogID int) []model.Post
+	GetByBlogID(ctx context.Context, blogID int) ([]model.Post, error)
 }
 
 type BlogsService struct {
@@ -34,7 +34,10 @@ func (bs *BlogsService) Update(ctx context.Context, ID int, name, description, w
 	return bs.repo.Update(ctx, ID, name, description, websiteURL)
 }
 func (bs *BlogsService) Delete(ctx context.Context, ID int) error {
-	existingPosts := bs.postReader.GetByBlogID(ctx, ID)
+	existingPosts, err := bs.postReader.GetByBlogID(ctx, ID)
+	if err != nil {
+		return err
+	}
 	if len(existingPosts) > 0 {
 		return model.ErrPostsExists
 	}
