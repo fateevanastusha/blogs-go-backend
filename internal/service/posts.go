@@ -12,8 +12,8 @@ type postsRepo interface {
 	Update(ctx context.Context, ID int, title, shortDescription, content string) (model.Post, error)
 	Delete(ctx context.Context, ID int) error
 	GetByID(ctx context.Context, ID int) (model.Post, error)
-	GetAll(ctx context.Context) []model.Post
-	GetByBlogID(ctx context.Context, blogID int) []model.Post
+	GetAll(ctx context.Context) ([]model.Post, error)
+	GetByBlogID(ctx context.Context, blogID int) ([]model.Post, error)
 }
 
 type blogsReader interface {
@@ -47,9 +47,9 @@ func (ps *PostsService) Delete(ctx context.Context, ID int) error {
 func (ps *PostsService) GetByID(ctx context.Context, ID int) (model.Post, error) {
 	return ps.repo.GetByID(ctx, ID)
 }
-func (ps *PostsService) GetAll(ctx context.Context) []model.Post {
+func (ps *PostsService) GetAll(ctx context.Context) ([]model.Post, error) {
 	return ps.repo.GetAll(ctx)
 }
-func (ps *PostsService) GetByBlogID(ctx context.Context, blogID int) []model.Post {
+func (ps *PostsService) GetByBlogID(ctx context.Context, blogID int) ([]model.Post, error) {
 	return ps.repo.GetByBlogID(ctx, blogID)
 }

@@ -83,11 +83,11 @@ func (br *BlogsRepo) GetByID(ctx context.Context, ID int) (model.Blog, error) {
 	return blog, nil
 }
 
-func (br *BlogsRepo) GetAll(ctx context.Context) []model.Blog {
+func (br *BlogsRepo) GetAll(ctx context.Context) ([]model.Blog, error) {
 	br.mu.Lock()
 	defer br.mu.Unlock()
 
 	res := make([]model.Blog, len(br.blogs))
 	copy(res, br.blogs)
-	return res
+	return res, nil
 }

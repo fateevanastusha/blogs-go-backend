@@ -84,16 +84,16 @@ func (pr *PostsRepo) GetByID(ctx context.Context, ID int) (model.Post, error) {
 	return post, nil
 }
 
-func (pr *PostsRepo) GetAll(ctx context.Context) []model.Post {
+func (pr *PostsRepo) GetAll(ctx context.Context) ([]model.Post, error) {
 	pr.mu.Lock()
 	defer pr.mu.Unlock()
 
 	res := make([]model.Post, len(pr.posts))
 	copy(res, pr.posts)
-	return res
+	return res, nil
 }
 
-func (pr *PostsRepo) GetByBlogID(ctx context.Context, blogID int) []model.Post {
+func (pr *PostsRepo) GetByBlogID(ctx context.Context, blogID int) ([]model.Post, error) {
 	pr.mu.Lock()
 	defer pr.mu.Unlock()
 
@@ -103,5 +103,5 @@ func (pr *PostsRepo) GetByBlogID(ctx context.Context, blogID int) []model.Post {
 			res = append(res, p)
 		}
 	}
-	return res
+	return res, nil
 }
