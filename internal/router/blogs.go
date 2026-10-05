@@ -48,12 +48,11 @@ func (b *Blogs) getAll() http.HandlerFunc {
 			return
 		}
 		respond(w, r, http.StatusOK, res)
-		return
 	}
 }
 func (b *Blogs) getByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(mux.Vars(r)["id"])
+		id, err := strconv.Atoi(mux.Vars(r)["ID"])
 		if err != nil {
 			respondError(w, r, http.StatusBadRequest, errors.New("bad ID"))
 			return
@@ -65,7 +64,6 @@ func (b *Blogs) getByID() http.HandlerFunc {
 			return
 		}
 		respond(w, r, http.StatusOK, res)
-		return
 	}
 }
 func (b *Blogs) create() http.HandlerFunc {
@@ -95,7 +93,6 @@ func (b *Blogs) create() http.HandlerFunc {
 			return
 		}
 		respond(w, r, http.StatusCreated, res)
-		return
 	}
 }
 func (b *Blogs) putByID() http.HandlerFunc {
@@ -105,7 +102,7 @@ func (b *Blogs) putByID() http.HandlerFunc {
 		WebsiteURL  string `json:"websiteURL"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(mux.Vars(r)["id"])
+		id, err := strconv.Atoi(mux.Vars(r)["ID"])
 		if err != nil {
 			respondError(w, r, http.StatusBadRequest, errors.New("bad ID"))
 			return
@@ -135,12 +132,11 @@ func (b *Blogs) putByID() http.HandlerFunc {
 			return
 		}
 		respond(w, r, http.StatusCreated, res)
-		return
 	}
 }
 func (b *Blogs) deleteByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(mux.Vars(r)["id"])
+		id, err := strconv.Atoi(mux.Vars(r)["ID"])
 		if err != nil {
 			respondError(w, r, http.StatusBadRequest, errors.New("bad ID"))
 			return
@@ -156,6 +152,5 @@ func (b *Blogs) deleteByID() http.HandlerFunc {
 			return
 		}
 		respond(w, r, http.StatusNoContent, nil)
-		return
 	}
 }

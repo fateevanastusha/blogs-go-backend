@@ -1,7 +1,6 @@
 package server
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/fateevanastusha/blogs-go-backend/internal/router"
@@ -21,12 +20,20 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func Start(address string) error {
+	server, err := New()
+	if err != nil {
+		server.logger.Fatal(err)
+	}
+	return http.ListenAndServe(address, server)
+}
+
+func New() (*Server, error) {
 	server := &Server{
 		Router: mux.NewRouter(),
 		logger: logrus.New(),
 	}
 	server.configureRouter()
-	return http.ListenAndServe(address, server)
+	return server, nil
 }
 
 func (s *Server) configureRouter() {
@@ -38,10 +45,10 @@ func (s *Server) configureRouter() {
 	postsService := service.NewPostsService(postsRepo, blogsRepo)
 
 	if err := router.ConfigureBlogsRouter(s.Router, s.logger, blogsService); err != nil {
-		log.Fatal(err)
+		s.logger.Fatal(err)
 	}
 	if err := router.ConfigurePostsRouter(s.Router, s.logger, postsService); err != nil {
-		log.Fatal(err)
+		s.logger.Fatal(err)
 	}
 
 }

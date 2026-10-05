@@ -48,12 +48,11 @@ func (b *Posts) getAll() http.HandlerFunc {
 			return
 		}
 		respond(w, r, http.StatusOK, res)
-		return
 	}
 }
 func (b *Posts) getByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(mux.Vars(r)["id"])
+		id, err := strconv.Atoi(mux.Vars(r)["ID"])
 		if err != nil {
 			respondError(w, r, http.StatusBadRequest, errors.New("bad ID"))
 			return
@@ -65,7 +64,6 @@ func (b *Posts) getByID() http.HandlerFunc {
 			return
 		}
 		respond(w, r, http.StatusOK, res)
-		return
 	}
 }
 func (b *Posts) create() http.HandlerFunc {
@@ -100,7 +98,6 @@ func (b *Posts) create() http.HandlerFunc {
 			return
 		}
 		respond(w, r, http.StatusCreated, res)
-		return
 	}
 }
 func (b *Posts) putByID() http.HandlerFunc {
@@ -110,7 +107,7 @@ func (b *Posts) putByID() http.HandlerFunc {
 		Content          string `json:"content" validate:"required,max=1000"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(mux.Vars(r)["id"])
+		id, err := strconv.Atoi(mux.Vars(r)["ID"])
 		if err != nil {
 			respondError(w, r, http.StatusBadRequest, errors.New("bad ID"))
 			return
@@ -140,13 +137,12 @@ func (b *Posts) putByID() http.HandlerFunc {
 			return
 		}
 		respond(w, r, http.StatusCreated, res)
-		return
 
 	}
 }
 func (b *Posts) deleteByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(mux.Vars(r)["id"])
+		id, err := strconv.Atoi(mux.Vars(r)["ID"])
 		if err != nil {
 			respondError(w, r, http.StatusBadRequest, errors.New("bad ID"))
 			return
@@ -162,6 +158,5 @@ func (b *Posts) deleteByID() http.HandlerFunc {
 			return
 		}
 		respond(w, r, http.StatusOK, nil)
-		return
 	}
 }
