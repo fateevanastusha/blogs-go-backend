@@ -22,10 +22,16 @@ func DoRequest(t *testing.T, h http.Handler, method, path string, body any) *htt
 	return rec
 }
 
-type Case struct {
+type blogCase struct {
 	body         map[string]string
 	description  string
 	expectStatus int
 	id           int // для запросов по id; 0 — взять id созданного в тесте блога
+	after        func(t *testing.T, h http.Handler, rec *httptest.ResponseRecorder)
+}
+type postCase struct {
+	body         map[string]any
+	description  string
+	expectStatus int
 	after        func(t *testing.T, h http.Handler, rec *httptest.ResponseRecorder)
 }

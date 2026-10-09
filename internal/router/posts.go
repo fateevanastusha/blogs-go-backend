@@ -90,7 +90,7 @@ func (b *Posts) create() http.HandlerFunc {
 
 		res, err := b.service.Create(r.Context(), req.Title, req.ShortDescription, req.Content, req.BlogID)
 		if err != nil {
-			if errors.As(err, model.ErrBlogNotFound) {
+			if errors.Is(err, model.ErrBlogNotFound) {
 				respondError(w, r, http.StatusNotFound, err)
 				return
 			}
@@ -129,7 +129,7 @@ func (b *Posts) putByID() http.HandlerFunc {
 
 		res, err := b.service.Update(r.Context(), id, req.Title, req.ShortDescription, req.Content)
 		if err != nil {
-			if errors.As(err, model.ErrNotFound) {
+			if errors.Is(err, model.ErrNotFound) {
 				respondError(w, r, http.StatusNotFound, err)
 				return
 			}
@@ -150,13 +150,13 @@ func (b *Posts) deleteByID() http.HandlerFunc {
 
 		err = b.service.Delete(r.Context(), id)
 		if err != nil {
-			if errors.As(err, model.ErrPostsExists) {
+			if errors.Is(err, model.ErrPostsExists) {
 				respondError(w, r, http.StatusBadRequest, err)
 				return
 			}
 			respondError(w, r, http.StatusNotFound, err)
 			return
 		}
-		respond(w, r, http.StatusOK, nil)
+		respond(w, r, http.StatusNoContent, nil)
 	}
 }
