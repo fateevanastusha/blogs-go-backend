@@ -25,13 +25,20 @@ func getAllEmptyBlogsCheck(t *testing.T, h http.Handler, _ *httptest.ResponseRec
 // 	require.Equal(t, http.StatusNotFound, rec.Code)
 // }
 
-// func create(t *testing.T, h http.Handler) model.Blog {
-// 	rec := DoRequest(t, h, http.MethodPost, "/blogs", map[string]string{"name": "test blog", "description": "test description", "websiteURL": "https://x.com"})
-// 	require.Equal(t, http.StatusCreated, rec.Code)
-// 	var blog model.Blog
-// 	require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &blog))
-// 	return blog
-// }
+func create(t *testing.T, h http.Handler) model.Blog {
+	rec := DoRequest(t, h, http.MethodPost, "/blogs", map[string]string{"name": "test blog", "description": "test description", "websiteURL": "https://x.com"})
+	require.Equal(t, http.StatusCreated, rec.Code)
+	var blog model.Blog
+	require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &blog))
+	return blog
+}
+
+func get(t *testing.T, h http.Handler, id int) model.Blog {
+	rec := DoRequest(t, h, http.MethodGet, "/blogs/"+strconv.Itoa(id), nil)
+	var blog model.Blog
+	require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &blog))
+	return blog
+}
 
 // func delete(t *testing.T, h http.Handler, id int) {
 // 	rec := DoRequest(t, h, http.MethodDelete, "/blogs/"+strconv.Itoa(id), nil)
@@ -100,10 +107,61 @@ func TestCreateBlogs(t *testing.T) {
 
 func TestPutBlogs(t *testing.T) {
 	cases := []Case{
-		{},
-		{},
-		{},
-		{},
+		{
+			body:         map[string]string{"name": "edited", "description": "edited", "websiteURL": "https://x.com?edited=true"},
+			description:  "success case",
+			expectStatus: http.StatusCreated,
+		},
+		{
+			body:         map[string]string{"description": "d", "websiteURL": "https://x.com"},
+			description:  "no name",
+			expectStatus: http.StatusBadRequest,
+		},
+		{
+			body:         map[string]string{"name": "lala", "description": "d", "websiteURL": "hts/x.com"},
+			description:  "invalid url",
+			expectStatus: http.StatusBadRequest,
+		},
+		{
+			body:         map[string]string{"name": "lalalalalalalalalalalalalaalalalala", "description": "d", "websiteURL": "https://x.com"},
+			description:  "too long name",
+			expectStatus: http.StatusBadRequest,
+		},
+		{
+			body:         map[string]string{},
+			description:  "empty body",
+			expectStatus: http.StatusBadRequest,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.description, func(t *testing.T) {
+
+			s, err := server.New()
+			require.NoError(t, err)
+
+			newBlog := create(t, s)
+
+			rec := DoRequest(t, s, http.MethodPut, "/blogs/"+strconv.Itoa(newBlog.ID), c.body)
+			require.Equal(t, c.expectStatus, rec.Code)
+			if c.expectStatus == http.StatusBadRequest {
+				notEditedBlog := get(t, s, newBlog.ID)
+				require.Equal(t, newBlog.Description, notEditedBlog.Description)
+				require.Equal(t, newBlog.Name, notEditedBlog.Name)
+				require.Equal(t, newBlog.WebsiteURL, notEditedBlog.WebsiteURL)
+			}
+			if c.expectStatus == http.StatusCreated {
+				editedBlog := get(t, s, newBlog.ID)
+				require.Equal(t, c.body["description"], editedBlog.Description)
+				require.Equal(t, c.body["name"], editedBlog.Name)
+				require.Equal(t, c.body["websiteURL"], editedBlog.WebsiteURL)
+			}
+
+			if c.after != nil {
+				c.after(t, s, rec)
+			}
+
+		})
 	}
 
 }

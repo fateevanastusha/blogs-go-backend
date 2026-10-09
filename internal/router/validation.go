@@ -33,7 +33,7 @@ func message(fe validator.FieldError) string {
 	case "required":
 		return "is required"
 	case "max":
-		return "must be at most " + fe.Param() + " characters"
+		return "must be a maximum of " + fe.Param() + " characters"
 	case "url":
 		return "must be a valid URL"
 	case "startsWith":

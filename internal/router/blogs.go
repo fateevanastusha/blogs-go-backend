@@ -97,9 +97,9 @@ func (b *Blogs) create() http.HandlerFunc {
 }
 func (b *Blogs) putByID() http.HandlerFunc {
 	type request struct {
-		Name        string `json:"name"`
-		Description string `json:"description"`
-		WebsiteURL  string `json:"websiteURL"`
+		Name        string `json:"name" validate:"required,max=15"`
+		Description string `json:"description" validate:"required,max=500"`
+		WebsiteURL  string `json:"websiteURL" validate:"required,max=100,url,startswith=https://"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(mux.Vars(r)["ID"])
@@ -124,7 +124,7 @@ func (b *Blogs) putByID() http.HandlerFunc {
 
 		res, err := b.service.Update(r.Context(), id, req.Name, req.Description, req.WebsiteURL)
 		if err != nil {
-			if errors.As(err, model.ErrBlogNotFound) {
+			if errors.Is(err, model.ErrBlogNotFound) {
 				respondError(w, r, http.StatusNotFound, err)
 				return
 			}
@@ -144,7 +144,7 @@ func (b *Blogs) deleteByID() http.HandlerFunc {
 
 		err = b.service.Delete(r.Context(), id)
 		if err != nil {
-			if errors.As(err, model.ErrPostsExists) {
+			if errors.Is(err, model.ErrPostsExists) {
 				respondError(w, r, http.StatusBadRequest, err)
 				return
 			}
