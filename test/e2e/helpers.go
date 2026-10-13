@@ -10,13 +10,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func DoRequest(t *testing.T, h http.Handler, method, path string, body any) *httptest.ResponseRecorder {
+func DoRequest(t *testing.T, h http.Handler, method, path string, body any, auth bool) *httptest.ResponseRecorder {
 	t.Helper()
 	var buf bytes.Buffer
 	if body != nil {
 		require.NoError(t, json.NewEncoder(&buf).Encode(body))
 	}
 	req := httptest.NewRequest(method, path, &buf)
+	if auth {
+		req.SetBasicAuth("admin", "qwerty")
+	}
 	rec := httptest.NewRecorder()
 	h.ServeHTTP(rec, req)
 	return rec

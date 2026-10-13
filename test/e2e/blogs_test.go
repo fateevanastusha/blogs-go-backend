@@ -27,7 +27,7 @@ func TestCreateBlogs(t *testing.T) {
 				require.Equal(t, "test description", blog.Description)
 				require.Equal(t, "https://x.com", blog.WebsiteURL)
 
-				rec = DoRequest(t, s, http.MethodGet, "/blogs/"+strconv.Itoa(blog.ID), nil)
+				rec = DoRequest(t, s, http.MethodGet, "/blogs/"+strconv.Itoa(blog.ID), nil, true)
 				require.Equal(t, http.StatusOK, rec.Code)
 			},
 		},
@@ -62,7 +62,7 @@ func TestCreateBlogs(t *testing.T) {
 			s, err := server.New()
 			require.NoError(t, err)
 
-			rec := DoRequest(t, s, http.MethodPost, "/blogs", c.body)
+			rec := DoRequest(t, s, http.MethodPost, "/blogs", c.body, true)
 			require.Equal(t, c.expectStatus, rec.Code)
 			if c.after != nil {
 				c.after(t, s, rec)
@@ -70,6 +70,14 @@ func TestCreateBlogs(t *testing.T) {
 
 		})
 	}
+
+	t.Run("check auth", func(t *testing.T) {
+		s, err := server.New()
+		require.NoError(t, err)
+		rec := DoRequest(t, s, http.MethodPost, "/blogs", map[string]string{}, false)
+		require.Equal(t, http.StatusUnauthorized, rec.Code)
+	})
+
 }
 
 func TestPutBlogs(t *testing.T) {
@@ -109,7 +117,7 @@ func TestPutBlogs(t *testing.T) {
 
 			newBlog := createBlog(t, s)
 
-			rec := DoRequest(t, s, http.MethodPut, "/blogs/"+strconv.Itoa(newBlog.ID), c.body)
+			rec := DoRequest(t, s, http.MethodPut, "/blogs/"+strconv.Itoa(newBlog.ID), c.body, true)
 			require.Equal(t, c.expectStatus, rec.Code)
 			if c.expectStatus == http.StatusBadRequest {
 				notEditedBlog := getBlog(t, s, newBlog.ID)
@@ -131,6 +139,13 @@ func TestPutBlogs(t *testing.T) {
 		})
 	}
 
+	t.Run("check auth", func(t *testing.T) {
+		s, err := server.New()
+		require.NoError(t, err)
+		rec := DoRequest(t, s, http.MethodPut, "/blogs/23", map[string]string{}, false)
+		require.Equal(t, http.StatusUnauthorized, rec.Code)
+	})
+
 }
 
 func TestDeleteBlogs(t *testing.T) {
@@ -140,7 +155,7 @@ func TestDeleteBlogs(t *testing.T) {
 
 		newBlog := createBlog(t, s)
 
-		rec := DoRequest(t, s, http.MethodDelete, "/blogs/"+strconv.Itoa(newBlog.ID), nil)
+		rec := DoRequest(t, s, http.MethodDelete, "/blogs/"+strconv.Itoa(newBlog.ID), nil, true)
 		require.Equal(t, http.StatusNoContent, rec.Code)
 	})
 	t.Run("delete already deleted", func(t *testing.T) {
@@ -149,10 +164,10 @@ func TestDeleteBlogs(t *testing.T) {
 
 		newBlog := createBlog(t, s)
 
-		rec := DoRequest(t, s, http.MethodDelete, "/blogs/"+strconv.Itoa(newBlog.ID), nil)
+		rec := DoRequest(t, s, http.MethodDelete, "/blogs/"+strconv.Itoa(newBlog.ID), nil, true)
 		require.Equal(t, http.StatusNoContent, rec.Code)
 
-		rec = DoRequest(t, s, http.MethodDelete, "/blogs/"+strconv.Itoa(newBlog.ID), nil)
+		rec = DoRequest(t, s, http.MethodDelete, "/blogs/"+strconv.Itoa(newBlog.ID), nil, true)
 		require.Equal(t, http.StatusNotFound, rec.Code)
 	})
 
@@ -160,7 +175,7 @@ func TestDeleteBlogs(t *testing.T) {
 		s, err := server.New()
 		require.NoError(t, err)
 
-		rec := DoRequest(t, s, http.MethodDelete, "/blogs/434444", nil)
+		rec := DoRequest(t, s, http.MethodDelete, "/blogs/434444", nil, true)
 		require.Equal(t, http.StatusNotFound, rec.Code)
 	})
 
@@ -171,8 +186,15 @@ func TestDeleteBlogs(t *testing.T) {
 		newBlog := createBlog(t, s)
 		createPost(t, s, newBlog.ID)
 
-		rec := DoRequest(t, s, http.MethodDelete, "/blogs/"+strconv.Itoa(newBlog.ID), nil)
+		rec := DoRequest(t, s, http.MethodDelete, "/blogs/"+strconv.Itoa(newBlog.ID), nil, true)
 		require.Equal(t, http.StatusBadRequest, rec.Code)
+	})
+
+	t.Run("check auth", func(t *testing.T) {
+		s, err := server.New()
+		require.NoError(t, err)
+		rec := DoRequest(t, s, http.MethodDelete, "/blogs/23", map[string]string{}, false)
+		require.Equal(t, http.StatusUnauthorized, rec.Code)
 	})
 }
 
@@ -183,7 +205,7 @@ func TestGetByIdBlogs(t *testing.T) {
 
 		newBlog := createBlog(t, s)
 
-		rec := DoRequest(t, s, http.MethodGet, "/blogs/"+strconv.Itoa(newBlog.ID), nil)
+		rec := DoRequest(t, s, http.MethodGet, "/blogs/"+strconv.Itoa(newBlog.ID), nil, false)
 		require.Equal(t, http.StatusOK, rec.Code)
 		var blog model.Blog
 		require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &blog))
@@ -196,7 +218,7 @@ func TestGetByIdBlogs(t *testing.T) {
 		s, err := server.New()
 		require.NoError(t, err)
 
-		rec := DoRequest(t, s, http.MethodGet, "/blogs/434444", nil)
+		rec := DoRequest(t, s, http.MethodGet, "/blogs/434444", nil, false)
 		require.Equal(t, http.StatusNotFound, rec.Code)
 	})
 
@@ -206,7 +228,7 @@ func TestGetByIdBlogs(t *testing.T) {
 		newBlog := createBlog(t, s)
 		deleteBlog(t, s, newBlog.ID)
 
-		rec := DoRequest(t, s, http.MethodGet, "/blogs/"+strconv.Itoa(newBlog.ID), nil)
+		rec := DoRequest(t, s, http.MethodGet, "/blogs/"+strconv.Itoa(newBlog.ID), nil, false)
 		require.Equal(t, http.StatusNotFound, rec.Code)
 	})
 
@@ -219,14 +241,14 @@ func TestGetBlogs(t *testing.T) {
 
 		var blogs []model.Blog
 
-		rec := DoRequest(t, s, http.MethodGet, "/blogs", nil)
+		rec := DoRequest(t, s, http.MethodGet, "/blogs", nil, false)
 		require.Equal(t, http.StatusOK, rec.Code)
 		require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &blogs))
 		require.Equal(t, 0, len(blogs))
 
 		newBlogs := []model.Blog{createBlog(t, s), createBlog(t, s), createBlog(t, s)}
 
-		rec = DoRequest(t, s, http.MethodGet, "/blogs", nil)
+		rec = DoRequest(t, s, http.MethodGet, "/blogs", nil, false)
 		require.Equal(t, http.StatusOK, rec.Code)
 		require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &blogs))
 		require.Equal(t, 3, len(newBlogs))
@@ -242,7 +264,7 @@ func TestGetBlogs(t *testing.T) {
 			deleteBlog(t, s, newBlogs[i].ID)
 		}
 
-		rec = DoRequest(t, s, http.MethodGet, "/blogs", nil)
+		rec = DoRequest(t, s, http.MethodGet, "/blogs", nil, false)
 		require.Equal(t, http.StatusOK, rec.Code)
 		require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &blogs))
 		require.Equal(t, 0, len(blogs))

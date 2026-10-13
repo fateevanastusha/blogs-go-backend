@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	"github.com/fateevanastusha/blogs-go-backend/internal/middleware"
 	"github.com/fateevanastusha/blogs-go-backend/internal/router"
 	"github.com/fateevanastusha/blogs-go-backend/internal/service"
 	"github.com/fateevanastusha/blogs-go-backend/internal/storage"
@@ -37,6 +38,7 @@ func New() (*Server, error) {
 }
 
 func (s *Server) configureRouter() {
+	auth := middleware.BasicAuth("admin", "qwerty")
 
 	blogsRepo := storage.NewBlogsRepo()
 	postsRepo := storage.NewPostsRepo()
@@ -44,10 +46,10 @@ func (s *Server) configureRouter() {
 	blogsService := service.NewBlogsService(blogsRepo, postsRepo)
 	postsService := service.NewPostsService(postsRepo, blogsRepo)
 
-	if err := router.ConfigureBlogsRouter(s.Router, s.logger, blogsService); err != nil {
+	if err := router.ConfigureBlogsRouter(s.Router, s.logger, blogsService, auth); err != nil {
 		s.logger.Fatal(err)
 	}
-	if err := router.ConfigurePostsRouter(s.Router, s.logger, postsService); err != nil {
+	if err := router.ConfigurePostsRouter(s.Router, s.logger, postsService, auth); err != nil {
 		s.logger.Fatal(err)
 	}
 

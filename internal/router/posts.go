@@ -26,7 +26,7 @@ type Posts struct {
 	service postsService
 }
 
-func ConfigurePostsRouter(r *mux.Router, logger *logrus.Logger, service postsService) error {
+func ConfigurePostsRouter(r *mux.Router, logger *logrus.Logger, service postsService, basicAuth func(http.Handler) http.Handler) error {
 	posts := &Posts{
 		logger:  logger,
 		service: service,
@@ -34,9 +34,9 @@ func ConfigurePostsRouter(r *mux.Router, logger *logrus.Logger, service postsSer
 	sub := r.PathPrefix("/posts").Subrouter()
 	sub.HandleFunc("", posts.getAll()).Methods("GET")
 	sub.HandleFunc("/{ID}", posts.getByID()).Methods("GET")
-	sub.HandleFunc("", posts.create()).Methods("POST")
-	sub.HandleFunc("/{ID}", posts.putByID()).Methods("PUT")
-	sub.HandleFunc("/{ID}", posts.deleteByID()).Methods("DELETE")
+	sub.Handle("", basicAuth(posts.create())).Methods("POST")
+	sub.Handle("/{ID}", basicAuth(posts.putByID())).Methods("PUT")
+	sub.Handle("/{ID}", basicAuth(posts.deleteByID())).Methods("DELETE")
 	return nil
 }
 
