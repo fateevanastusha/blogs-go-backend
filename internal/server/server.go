@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	"github.com/fateevanastusha/blogs-go-backend/internal/config"
 	"github.com/fateevanastusha/blogs-go-backend/internal/middleware"
 	"github.com/fateevanastusha/blogs-go-backend/internal/router"
 	"github.com/fateevanastusha/blogs-go-backend/internal/service"
@@ -20,25 +21,25 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.Router.ServeHTTP(w, r)
 }
 
-func Start(address string) error {
-	server, err := New()
+func Start(cfg config.Config) error {
+	server, err := New(cfg)
 	if err != nil {
-		server.logger.Fatal(err)
+		return err
 	}
-	return http.ListenAndServe(address, server)
+	return http.ListenAndServe(":"+cfg.Port, server)
 }
 
-func New() (*Server, error) {
+func New(cfg config.Config) (*Server, error) {
 	server := &Server{
 		Router: mux.NewRouter(),
 		logger: logrus.New(),
 	}
-	server.configureRouter()
+	server.configureRouter(cfg)
 	return server, nil
 }
 
-func (s *Server) configureRouter() {
-	auth := middleware.BasicAuth("admin", "qwerty")
+func (s *Server) configureRouter(cfg config.Config) {
+	auth := middleware.BasicAuth(cfg.AuthLogin, cfg.AuthPassword)
 
 	blogsRepo := storage.NewBlogsRepo()
 	postsRepo := storage.NewPostsRepo()

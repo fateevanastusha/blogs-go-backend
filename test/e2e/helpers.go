@@ -7,8 +7,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/fateevanastusha/blogs-go-backend/internal/config"
 	"github.com/stretchr/testify/require"
 )
+
+var testConfig = config.Config{
+	Port:         "3005",
+	AuthLogin:    "admin",
+	AuthPassword: "qwerty",
+}
 
 func DoRequest(t *testing.T, h http.Handler, method, path string, body any, auth bool) *httptest.ResponseRecorder {
 	t.Helper()
@@ -18,7 +25,7 @@ func DoRequest(t *testing.T, h http.Handler, method, path string, body any, auth
 	}
 	req := httptest.NewRequest(method, path, &buf)
 	if auth {
-		req.SetBasicAuth("admin", "qwerty")
+		req.SetBasicAuth(testConfig.AuthLogin, testConfig.AuthPassword)
 	}
 	rec := httptest.NewRecorder()
 	h.ServeHTTP(rec, req)

@@ -2,18 +2,18 @@ package main
 
 import (
 	"log"
-	"os"
 
+	"github.com/fateevanastusha/blogs-go-backend/internal/config"
 	"github.com/fateevanastusha/blogs-go-backend/internal/server"
 )
 
 func main() {
-	address := ":3005"
-	if port := os.Getenv("PORT"); port != "" {
-		address = ":" + port
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	if err := server.Start(address); err != nil {
+	if err := server.Start(cfg); err != nil {
 		log.Fatal(err)
 	}
 }
