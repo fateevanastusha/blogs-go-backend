@@ -95,7 +95,7 @@ func TestCreatePosts(t *testing.T) {
 	t.Run("check auth", func(t *testing.T) {
 		s, err := server.New()
 		require.NoError(t, err)
-		rec := DoRequest(t, s, http.MethodPost, "/posts/23", map[string]string{}, false)
+		rec := DoRequest(t, s, http.MethodPost, "/posts", map[string]string{}, false)
 		require.Equal(t, http.StatusUnauthorized, rec.Code)
 	})
 }
