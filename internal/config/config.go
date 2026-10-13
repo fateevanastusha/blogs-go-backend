@@ -9,6 +9,7 @@ type Config struct {
 	Port         string
 	AuthLogin    string
 	AuthPassword string
+	LogLevel     string
 }
 
 func Load() (Config, error) {
@@ -16,6 +17,7 @@ func Load() (Config, error) {
 		Port:         getEnv("PORT", "3005"),
 		AuthLogin:    os.Getenv("AUTH_LOGIN"),
 		AuthPassword: os.Getenv("AUTH_PASSWORD"),
+		LogLevel:     getEnv("LOG_LEVEL", "info"),
 	}
 	if cfg.AuthLogin == "" || cfg.AuthPassword == "" {
 		return Config{}, errors.New("AUTH_LOGIN and AUTH_PASSWORD must be set")

@@ -10,7 +10,6 @@ import (
 
 	"github.com/fateevanastusha/blogs-go-backend/internal/model"
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
 )
 
 type blogsService interface {
@@ -22,13 +21,11 @@ type blogsService interface {
 }
 
 type Blogs struct {
-	logger  *logrus.Logger
 	service blogsService
 }
 
-func ConfigureBlogsRouter(r *mux.Router, logger *logrus.Logger, service blogsService, basicAuth func(http.Handler) http.Handler) error {
+func ConfigureBlogsRouter(r *mux.Router, service blogsService, basicAuth func(http.Handler) http.Handler) error {
 	blogs := &Blogs{
-		logger:  logger,
 		service: service,
 	}
 	sub := r.PathPrefix("/blogs").Subrouter()
@@ -47,6 +44,7 @@ func (b *Blogs) getAll() http.HandlerFunc {
 			respondError(w, r, http.StatusBadRequest, err)
 			return
 		}
+
 		respond(w, r, http.StatusOK, res)
 	}
 }

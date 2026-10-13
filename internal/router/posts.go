@@ -10,7 +10,6 @@ import (
 
 	"github.com/fateevanastusha/blogs-go-backend/internal/model"
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
 )
 
 type postsService interface {
@@ -22,13 +21,11 @@ type postsService interface {
 }
 
 type Posts struct {
-	logger  *logrus.Logger
 	service postsService
 }
 
-func ConfigurePostsRouter(r *mux.Router, logger *logrus.Logger, service postsService, basicAuth func(http.Handler) http.Handler) error {
+func ConfigurePostsRouter(r *mux.Router, service postsService, basicAuth func(http.Handler) http.Handler) error {
 	posts := &Posts{
-		logger:  logger,
 		service: service,
 	}
 	sub := r.PathPrefix("/posts").Subrouter()

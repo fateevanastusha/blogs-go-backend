@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/fateevanastusha/blogs-go-backend/internal/config"
+	"github.com/fateevanastusha/blogs-go-backend/internal/logger"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,7 +16,11 @@ var testConfig = config.Config{
 	Port:         "3005",
 	AuthLogin:    "admin",
 	AuthPassword: "qwerty",
+	LogLevel:     "error",
 }
+
+// логи в тестах не нужны
+var testLogger = logger.New(testConfig.LogLevel)
 
 func DoRequest(t *testing.T, h http.Handler, method, path string, body any, auth bool) *httptest.ResponseRecorder {
 	t.Helper()

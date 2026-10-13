@@ -59,7 +59,7 @@ func TestCreateBlogs(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.description, func(t *testing.T) {
-			s, err := server.New(testConfig)
+			s, err := server.New(testConfig, testLogger)
 			require.NoError(t, err)
 
 			rec := DoRequest(t, s, http.MethodPost, "/blogs", c.body, true)
@@ -72,7 +72,7 @@ func TestCreateBlogs(t *testing.T) {
 	}
 
 	t.Run("check auth", func(t *testing.T) {
-		s, err := server.New(testConfig)
+		s, err := server.New(testConfig, testLogger)
 		require.NoError(t, err)
 		rec := DoRequest(t, s, http.MethodPost, "/blogs", map[string]string{}, false)
 		require.Equal(t, http.StatusUnauthorized, rec.Code)
@@ -112,7 +112,7 @@ func TestPutBlogs(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.description, func(t *testing.T) {
 
-			s, err := server.New(testConfig)
+			s, err := server.New(testConfig, testLogger)
 			require.NoError(t, err)
 
 			newBlog := createBlog(t, s)
@@ -140,7 +140,7 @@ func TestPutBlogs(t *testing.T) {
 	}
 
 	t.Run("check auth", func(t *testing.T) {
-		s, err := server.New(testConfig)
+		s, err := server.New(testConfig, testLogger)
 		require.NoError(t, err)
 		rec := DoRequest(t, s, http.MethodPut, "/blogs/23", map[string]string{}, false)
 		require.Equal(t, http.StatusUnauthorized, rec.Code)
@@ -150,7 +150,7 @@ func TestPutBlogs(t *testing.T) {
 
 func TestDeleteBlogs(t *testing.T) {
 	t.Run("success case", func(t *testing.T) {
-		s, err := server.New(testConfig)
+		s, err := server.New(testConfig, testLogger)
 		require.NoError(t, err)
 
 		newBlog := createBlog(t, s)
@@ -159,7 +159,7 @@ func TestDeleteBlogs(t *testing.T) {
 		require.Equal(t, http.StatusNoContent, rec.Code)
 	})
 	t.Run("delete already deleted", func(t *testing.T) {
-		s, err := server.New(testConfig)
+		s, err := server.New(testConfig, testLogger)
 		require.NoError(t, err)
 
 		newBlog := createBlog(t, s)
@@ -172,7 +172,7 @@ func TestDeleteBlogs(t *testing.T) {
 	})
 
 	t.Run("delete not existing", func(t *testing.T) {
-		s, err := server.New(testConfig)
+		s, err := server.New(testConfig, testLogger)
 		require.NoError(t, err)
 
 		rec := DoRequest(t, s, http.MethodDelete, "/blogs/434444", nil, true)
@@ -180,7 +180,7 @@ func TestDeleteBlogs(t *testing.T) {
 	})
 
 	t.Run("delete with existing post", func(t *testing.T) {
-		s, err := server.New(testConfig)
+		s, err := server.New(testConfig, testLogger)
 		require.NoError(t, err)
 
 		newBlog := createBlog(t, s)
@@ -191,7 +191,7 @@ func TestDeleteBlogs(t *testing.T) {
 	})
 
 	t.Run("check auth", func(t *testing.T) {
-		s, err := server.New(testConfig)
+		s, err := server.New(testConfig, testLogger)
 		require.NoError(t, err)
 		rec := DoRequest(t, s, http.MethodDelete, "/blogs/23", map[string]string{}, false)
 		require.Equal(t, http.StatusUnauthorized, rec.Code)
@@ -200,7 +200,7 @@ func TestDeleteBlogs(t *testing.T) {
 
 func TestGetByIdBlogs(t *testing.T) {
 	t.Run("success case", func(t *testing.T) {
-		s, err := server.New(testConfig)
+		s, err := server.New(testConfig, testLogger)
 		require.NoError(t, err)
 
 		newBlog := createBlog(t, s)
@@ -215,7 +215,7 @@ func TestGetByIdBlogs(t *testing.T) {
 	})
 
 	t.Run("get not existing", func(t *testing.T) {
-		s, err := server.New(testConfig)
+		s, err := server.New(testConfig, testLogger)
 		require.NoError(t, err)
 
 		rec := DoRequest(t, s, http.MethodGet, "/blogs/434444", nil, false)
@@ -223,7 +223,7 @@ func TestGetByIdBlogs(t *testing.T) {
 	})
 
 	t.Run("get deleted", func(t *testing.T) {
-		s, err := server.New(testConfig)
+		s, err := server.New(testConfig, testLogger)
 		require.NoError(t, err)
 		newBlog := createBlog(t, s)
 		deleteBlog(t, s, newBlog.ID)
@@ -236,7 +236,7 @@ func TestGetByIdBlogs(t *testing.T) {
 
 func TestGetBlogs(t *testing.T) {
 	t.Run("success case", func(t *testing.T) {
-		s, err := server.New(testConfig)
+		s, err := server.New(testConfig, testLogger)
 		require.NoError(t, err)
 
 		var blogs []model.Blog
